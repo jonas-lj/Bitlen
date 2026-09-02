@@ -26,42 +26,30 @@ theorem size_shiftRight (n k : Nat) : (n >>> k).size = n.size - k := by
 
 end Nat
 
-/-- `n < 2 ^ maxBits ⇒ 2 ≤ n ⇒ 2 ≤ maxBits` -/
-private theorem two_le_maxBits {n maxBits : Nat} (h : n < 2 ^ maxBits) (hn : 2 ≤ n) :
-    2 ≤ maxBits :=
-  Nat.lt_of_lt_of_le (Nat.lt_size.mpr (by rw [Nat.pow_one]; omega)) (Nat.size_le.mpr h)
-
-/-- `n < 2 ^ maxBits ⇒ n >>> m < 2 ^ (maxBits - m)` -/
-private theorem shift_lt {n maxBits : Nat} (h : n < 2 ^ maxBits) (m : Nat) :
-    n >>> m < 2 ^ (maxBits - m) :=
-  Nat.size_le.mp <| by
-    have := Nat.size_le.mpr h
-    rw [Nat.size_shiftRight]; omega
-
-/-- The number of bits in `n`, computed by binary search over `h : n < 2 ^ maxBits`. -/
-def bitLen (n maxBits : Nat) (h : n < 2 ^ maxBits) : Nat :=
-  match n, h with
-  | 0, _ => 0
-  | 1, _ => 1
-  | n + 2, h =>
-      if hp : (n + 2) >>> (maxBits / 2) > 0 then
-        maxBits / 2 + bitLen ((n + 2) >>> (maxBits / 2)) (maxBits - maxBits / 2)
-          (shift_lt h (maxBits / 2))
-      else
-        bitLen (n + 2) (maxBits / 2) (Nat.shiftRight_eq_zero_iff.mp (Nat.eq_zero_of_not_pos hp))
+/-- The number of bits in `n`, assuming `n < 2 ^ maxBits`; see `bitLen_eq_size`. -/
+def bitLen (n maxBits : Nat) : Nat :=
+  let k := maxBits / 2
+  if maxBits ≤ 1 then n
+  else if n >>> k = 0 then bitLen n k
+  else k + bitLen (n >>> k) (maxBits - k)
 termination_by maxBits
-decreasing_by all_goals (have := two_le_maxBits h (by omega); omega)
+decreasing_by all_goals omega
 
-/-- `bitLen n maxBits h = n.size` -/
-theorem bitLen_eq_size (n maxBits : Nat) (h : n < 2 ^ maxBits) : bitLen n maxBits h = n.size := by
-  induction n, maxBits, h using bitLen.induct with
-  | case1 => simp [bitLen]
-  | case2 => simp [bitLen]
-  | case3 maxBits n h hp _ ih =>
-      have hpos := Nat.size_pos.mpr hp
+/-- `n < 2 ^ maxBits ⇒ bitLen n maxBits = n.size` -/
+theorem bitLen_eq_size (n maxBits : Nat) (h : n < 2 ^ maxBits) : bitLen n maxBits = n.size := by
+  induction n, maxBits using bitLen.induct with
+  | case1 n maxBits hm =>
+      rw [bitLen, if_pos hm]
+      have h2 : n < 2 ^ 1 := Nat.size_le.mp (Nat.le_trans (Nat.size_le.mpr h) hm)
+      rw [Nat.pow_one] at h2
+      obtain rfl | rfl := Nat.le_one_iff_eq_zero_or_eq_one.mp (show n ≤ 1 by omega) <;> simp
+  | case2 n maxBits k hm hz ih =>
+      rw [bitLen, if_neg hm, if_pos hz]
+      exact ih (Nat.shiftRight_eq_zero_iff.mp hz)
+  | case3 n maxBits k hm hz ih =>
+      have hlt : n >>> (maxBits / 2) < 2 ^ (maxBits - maxBits / 2) :=
+        Nat.size_le.mp (by have := Nat.size_le.mpr h; rw [Nat.size_shiftRight]; omega)
+      have hpos : 0 < (n >>> (maxBits / 2)).size := Nat.size_pos.mpr (Nat.pos_of_ne_zero hz)
       rw [Nat.size_shiftRight] at hpos
-      rw [bitLen, dif_pos hp, ih, Nat.size_shiftRight]
-      have : Nat.size (Nat.succ (Nat.succ n)) = (n + 2).size := rfl
+      rw [bitLen, if_neg hm, if_neg hz, ih hlt, Nat.size_shiftRight]
       omega
-  | case4 maxBits n h hp _ ih =>
-      rw [bitLen, dif_neg hp, ih]
