@@ -8,11 +8,11 @@ import Mathlib.Data.Nat.Size
 
 namespace Nat
 
-/-- `n >>> k < 2 ^ j ↔ n < 2 ^ (j + k)` -/
+/-- `n >>> k < 2 ^ j ⇔ n < 2 ^ (j + k)` -/
 theorem shiftRight_lt_two_pow_iff (n k j : Nat) : n >>> k < 2 ^ j ↔ n < 2 ^ (j + k) := by
   rw [shiftRight_eq_div_pow, Nat.div_lt_iff_lt_mul (Nat.two_pow_pos _), Nat.pow_add]
 
-/-- `n >>> k = 0 ↔ n < 2 ^ k` -/
+/-- `n >>> k = 0 ⇔ n < 2 ^ k` -/
 theorem shiftRight_eq_zero_iff {n k : Nat} : n >>> k = 0 ↔ n < 2 ^ k := by
   rw [← Nat.lt_one_iff, ← Nat.pow_zero 2, shiftRight_lt_two_pow_iff, Nat.zero_add]
 
