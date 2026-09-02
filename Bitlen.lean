@@ -49,7 +49,7 @@ def bitLen (n maxBits : Nat) (h : n < 2 ^ maxBits) : Nat :=
 termination_by maxBits
 decreasing_by all_goals (have := two_le_maxBits h _hn; omega)
 
-/-- `bitLen` computes the bit length, i.e. it agrees with `Nat.size`. -/
+/-- `bitLen` computes the bit length of `n`, i.e. `Nat.size n`. -/
 theorem bitLen_eq_size (n maxBits : Nat) (h : n < 2 ^ maxBits) : bitLen n maxBits h = n.size := by
   induction n, maxBits, h using bitLen.induct with
   | case1 n maxBits h hn =>
@@ -62,15 +62,3 @@ theorem bitLen_eq_size (n maxBits : Nat) (h : n < 2 ^ maxBits) : bitLen n maxBit
       omega
   | case3 n maxBits h hn hp ih =>
       rw [bitLen, dif_neg hn, dif_neg hp, ih]
-
-/-- The result `r` of `bitLen` brackets `n`, with `2 ^ (r - 1) ≤ n < 2 ^ r`. -/
-theorem bitLen_spec (n maxBits : Nat) (h : n < 2 ^ maxBits) :
-    n < 2 ^ bitLen n maxBits h ∧ (bitLen n maxBits h ≠ 0 → 2 ^ (bitLen n maxBits h - 1) ≤ n) := by
-  rw [bitLen_eq_size]
-  exact ⟨Nat.lt_size_self n, fun hr => Nat.lt_size.mp (by omega)⟩
-
-/-- `bitLen n maxBits h` is the least `r` with `n < 2 ^ r`. -/
-theorem bitLen_isLeast (n maxBits : Nat) (h : n < 2 ^ maxBits) :
-    n < 2 ^ bitLen n maxBits h ∧ ∀ k, n < 2 ^ k → bitLen n maxBits h ≤ k := by
-  rw [bitLen_eq_size]
-  exact ⟨Nat.lt_size_self n, fun _ hk => Nat.size_le.mpr hk⟩
