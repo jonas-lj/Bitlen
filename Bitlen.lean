@@ -4,19 +4,7 @@ import Mathlib.Data.Nat.Size
 # Bit length by binary search
 
 Given `n` together with a budget `maxBits` satisfying `n < 2 ^ maxBits`, `bitLen` finds the
-number of significant bits of `n` by binary search on the budget, halving it at each step:
-
-```text
-bitLen n maxBits :=
-  if maxBits ≤ 1 then
-    n                                     -- n is 0 or 1, and is its own bit length
-  else
-    k := maxBits / 2
-    if n >>> k = 0 then
-      bitLen n k                          -- n fits in the low k bits; search there
-    else
-      k + bitLen (n >>> k) (maxBits - k)  -- the low k bits are significant; search above them
-```
+number of significant bits of `n` by binary search on the budget, halving it at each step.
 
 `bitLen_eq_size` proves that this computes the bit length as defined by
 [`Nat.size`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Bits.html#Nat.size),
