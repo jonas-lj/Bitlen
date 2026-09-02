@@ -13,7 +13,7 @@ mathlib's length of the binary representation: `n < 2 ^ maxBits ⇒ bitLen n max
 The algorithm is described at <https://www.jonaslindstrom.dk/?p=997>.
 -/
 
-/-- The number of bits in `n`, assuming `n < 2 ^ maxBits`; see `bitLen_eq_size`. -/
+/-- The number of bits in `n`, assuming `n < 2 ^ maxBits`. -/
 def bitLen (n maxBits : ℕ) : ℕ :=
   let k := maxBits / 2
   if maxBits ≤ 1 then n
