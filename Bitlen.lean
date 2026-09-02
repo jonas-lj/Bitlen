@@ -9,8 +9,6 @@ of `n` by binary search on `maxBits`, halving it at each step.
 `bitLen_eq_size` proves that this computes the bit length as defined by
 [`Nat.size`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Bits.html#Nat.size),
 mathlib's length of the binary representation: `n < 2 ^ maxBits ⇒ bitLen n maxBits = n.size`.
-Note that the bound is a hypothesis of the theorem rather than of the definition, so `bitLen`
-returns a junk value when it fails to hold.
 
 The algorithm is described at <https://www.jonaslindstrom.dk/?p=997>.
 -/
