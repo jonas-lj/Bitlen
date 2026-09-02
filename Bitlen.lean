@@ -27,6 +27,15 @@ returns a junk value when it fails to hold.
 The algorithm is described at <https://www.jonaslindstrom.dk/?p=997>.
 -/
 
+/-- The number of bits in `n`, assuming `n < 2 ^ maxBits`; see `bitLen_eq_size`. -/
+def bitLen (n maxBits : ℕ) : ℕ :=
+  let k := maxBits / 2
+  if maxBits ≤ 1 then n
+  else if n >>> k = 0 then bitLen n k
+  else k + bitLen (n >>> k) (maxBits - k)
+termination_by maxBits
+decreasing_by all_goals omega
+
 namespace Nat
 
 /-- `n >>> k < 2 ^ j ⇔ n < 2 ^ (j + k)` -/
@@ -46,15 +55,6 @@ theorem size_shiftRight (n k : ℕ) : (n >>> k).size = n.size - k := by
   omega
 
 end Nat
-
-/-- The number of bits in `n`, assuming `n < 2 ^ maxBits`; see `bitLen_eq_size`. -/
-def bitLen (n maxBits : ℕ) : ℕ :=
-  let k := maxBits / 2
-  if maxBits ≤ 1 then n
-  else if n >>> k = 0 then bitLen n k
-  else k + bitLen (n >>> k) (maxBits - k)
-termination_by maxBits
-decreasing_by all_goals omega
 
 /-- `n < 2 ^ maxBits ⇒ bitLen n maxBits = n.size` -/
 theorem bitLen_eq_size (n maxBits : ℕ) (h : n < 2 ^ maxBits) : bitLen n maxBits = n.size := by
