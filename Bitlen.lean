@@ -26,12 +26,12 @@ theorem size_shiftRight (n k : Nat) : (n >>> k).size = n.size - k := by
 
 end Nat
 
-/-- `n < 2 ^ maxBits → 2 ≤ n → 2 ≤ maxBits` -/
+/-- `n < 2 ^ maxBits ⇒ 2 ≤ n ⇒ 2 ≤ maxBits` -/
 private theorem two_le_maxBits {n maxBits : Nat} (h : n < 2 ^ maxBits) (hn : 2 ≤ n) :
     2 ≤ maxBits :=
   Nat.lt_of_lt_of_le (Nat.lt_size.mpr (by rw [Nat.pow_one]; omega)) (Nat.size_le.mpr h)
 
-/-- `n < 2 ^ maxBits → n >>> m < 2 ^ (maxBits - m)` -/
+/-- `n < 2 ^ maxBits ⇒ n >>> m < 2 ^ (maxBits - m)` -/
 private theorem shift_lt {n maxBits : Nat} (h : n < 2 ^ maxBits) (m : Nat) :
     n >>> m < 2 ^ (maxBits - m) :=
   Nat.size_le.mp <| by
